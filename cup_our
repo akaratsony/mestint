@@ -1,0 +1,45 @@
+from problem import Problem
+
+class Cup3(Problem):
+    def __init__(self):
+        #inicializáljuk a problémát
+        super().__init__((5,0,0),[(4,1,0),(4,0,1)])
+        #korsó lehetséges értékei
+        self.H1 = [1,2,3,4,5]
+        self.H2 = [0,1,2,3]
+        self.H3 = [0,1,2]
+        self.H = [[0,1,2,3,4,5],[0,1,2,3],[0,1,2]]
+    def actions(self, state):
+        #i az első korsó
+        #j a második korsó 
+        acts = [] #ebbe tároljuk el a végeredményt
+        for i in range(1,4): #amiből öntöm korsó
+            for j in range(1,4): #amibe öntöm korsó
+                if i!=j: #nem önthetem ugyan abba a korsóba
+                    if state[i-1] > 0 and state[j-1] < max(self.H[j-1]): #amiből öntöm korsónak az értéke nagyobb kell legyen mint 0 | és amibe öntöm korsónak pedig nem szabad ,hogy tele legyen
+                        acts.append("O {} {}".format(i,j)) #ha ez teljesül hozzá adom az acts,hoz a lépést
+    def result(self, state, action):
+
+        from_cup = int(action.split(' ')[1]) #szét szedem az actiontől kapott értékeket amiből öntöm
+        to_cup = int(action.split(' ')[2]) #amibe öntöm
+        
+        mennyiferbele = max(self.H[to_cup-1]) - state[to_cup-1] #megnézem,hogy mennyi fér még a korsóba
+        v = min(state[from_cup-1],mennyiferbele ) #megnézem az amiből öntöm korsó értékét hogy mennyi van benne, és megnézem ,hogy amibe öntöm mennyi fér és ezután veszem a kettő közül a legkisebb elemet
+        new_state =list(state) #létrehozok egy uj állapotot ami állapotokat tárol
+        new_state[from_cup-1] = state[from_cup-1] -v #amiből öntöm korsóból kivonom azt a mennyiséget amit át öntök
+        new_state[to_cup-1] =  state[to_cup-1] + v #amibe öntöm korsó pedig hozzá adom a mennyiséget
+        return tuple(new_state) #vissza adok egy tuplet
+
+    def value(self, state):
+        """we have no good heuristics"""
+        return 0
+
+
+if __name__ == '__main__':
+    c = Cup3()
+    print(c.initial, c.goal)
+    print(c.actions(c.initial))
+    print("eredmény")
+    print(c.result(c.initial, 'o_1_2'))
+
+
